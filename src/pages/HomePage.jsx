@@ -8,16 +8,35 @@ export default function HomePage() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Alle");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function getEvents() {
-      const response = await fetch(`${SUPABASE_URL}/events?order=date.asc`, { headers });
+useEffect(() => {
+  async function getEvents() {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+
+      const response = await fetch(`${SUPABASE_URL}/events?order=date.asc`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error("Kunne ikke hente events");
+      }
+
       const data = await response.json();
-      setEvents(data);
-    }
 
-    getEvents();
-  }, []);
+      setEvents(data);
+    } catch (error) {
+      console.error("Fejl ved hentning af events:", error);
+      setError("Events kunne ikke indlæses. Prøv igen senere.");
+    } finally {
+      setIsLoading(false);
+    }}
+  getEvents();
+}, []); 
 
   const categories = ["Alle", ...new Set(events.map((event) => event.category))];
 
@@ -46,7 +65,8 @@ export default function HomePage() {
         <p className="eyebrow">Kultur i Aarhus</p>
         <h1>Find plads til noget nyt.</h1>
         <p className="hero-copy">
-          Koncerter, talks og workshops samlet ét sted. Find dit næste event, og tilmeld dig på få minutter.
+          Koncerter, talks og workshops samlet ét sted. Find dit næste event, og
+          tilmeld dig på få minutter.
         </p>
         <a className="hero-link" href="#events">
           Se kommende events ↓
@@ -74,35 +94,47 @@ export default function HomePage() {
           </label>
           <label>
             Kategori
-            <select value={category} onChange={(event) => setCategory(event.target.value)}>
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
               {categories.map((item) => (
                 <option key={item}>{item}</option>
               ))}
             </select>
           </label>
         </section>
-
         <section className="event-grid">
-          {filteredEvents.map((event) => (
-            <article className="event-card" key={event.id}>
-              <img src={event.image} alt="" />
-              <div className="event-card-content">
-                <p className="event-category">{event.category}</p>
-                <h3>{event.title}</h3>
-                <p>{event.summary}</p>
-                <div className="event-meta">
-                  <span>{formatEventDate(event.date)}</span>
-                  <span>{event.venueName}</span>
+          {isLoading && <p>Indlæser events...</p>}
+
+          {error && <p role="alert">{error}</p>}
+
+          {!isLoading &&
+            !error &&
+            filteredEvents.map((event) => (
+              <article className="event-card" key={event.id}>
+                <img src={event.image} alt="" />
+
+                <div className="event-card-content">
+                  <p className="event-category">{event.category}</p>
+
+                  <h3>{event.title}</h3>
+
+                  <p>{event.summary}</p>
+
+                  <div className="event-meta">
+                    <span>{formatEventDate(event.date)}</span>
+                    <span>{event.venueName}</span>
+                  </div>
+
+                  <Link className="card-link" to={`/events/${event.id}`}>
+                    Læs mere
+                  </Link>
                 </div>
-                <Link className="card-link" to={`/events/${event.id}`}>
-                  Læs mere
-                </Link>
-              </div>
-            </article>
-          ))}
+              </article>
+            ))}
         </section>
       </main>
-    
     </>
   );
 }

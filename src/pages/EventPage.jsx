@@ -10,18 +10,36 @@ export default function EventPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [submitError, setSubmitError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [eventError, setEventError] = useState(null);
 
-  useEffect(() => {
-    async function getEvent() {
+useEffect(() => {
+  async function getEvent() {
+    try {
+      setIsLoading(true);
+      setEventError(null);
+
       const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}`, {
         headers,
       });
-      const data = await response.json();
-      setEvent(data[0]);
-    }
 
-    getEvent();
-  }, [eventId]);
+      if (!response.ok) {
+        throw new Error("Kunne ikke hente event");
+      }
+
+      const data = await response.json();
+      if (!data[0]) {
+      throw new Error("Event ikke fundet");
+      }
+      setEvent(data[0]);
+    } catch (error) {
+      console.error("Fejl ved hentning af event:", error);
+      setEventError("Eventet kunne ikke indlæses. Prøv igen senere.");
+    } finally {
+      setIsLoading(false);
+    }}
+  getEvent();
+}, [eventId]);
 
   async function handleSubmit(eventSubmit) {
     eventSubmit.preventDefault();
@@ -64,9 +82,25 @@ export default function EventPage() {
     }
   }
 
-  if (!event) {
-    return null;
-  }
+ if (isLoading) {
+   return (
+     <main>
+       <p>Indlæser event...</p>
+     </main>
+   );
+ }
+
+ if (eventError) {
+   return (
+     <main>
+       <p role="alert">{eventError}</p>
+     </main>
+   );
+ }
+
+ if (!event) {
+   return null;
+ }
 
   const date = new Date(event.date);
 

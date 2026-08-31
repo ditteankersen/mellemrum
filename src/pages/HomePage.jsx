@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { SUPABASE_URL, headers } from "../services/supabase";
 
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const headers = {
-  apikey: import.meta.env.VITE_SUPABASE_APIKEY,
-  "Content-Type": "application/json"
-};
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);

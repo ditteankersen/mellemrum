@@ -625,6 +625,11 @@ select:focus {
   text-transform: uppercase;
 }
 
+.signup-panel input::placeholder {
+  color: #7a7a7a;
+  opacity: 1;
+} 
+
 .signup-panel button {
   background: var(--green);
   border: 0;

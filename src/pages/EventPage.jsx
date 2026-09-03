@@ -103,6 +103,16 @@ useEffect(() => {
 
   const date = new Date(event.date);
 
+  function getOptimizedImage(imageUrl, width) {
+    const url = new URL(imageUrl);
+
+    url.searchParams.set("w", width);
+    url.searchParams.set("q", "80");
+    url.searchParams.set("auto", "format");
+
+    return url.toString();
+  }
+
   return (
     <>
       <main className="event-page">
@@ -111,7 +121,7 @@ useEffect(() => {
         </Link>
 
         <section className="event-detail">
-          <img src={event.image} alt="" />
+          <img src={getOptimizedImage(event.image, 1400)} alt="" />
           <div className="event-detail-content">
             <p className="event-category">{event.category}</p>
             <h1>{event.title}</h1>
@@ -165,18 +175,22 @@ useEffect(() => {
 
           <form onSubmit={handleSubmit}>
             <label>
-              Navn
+              <span>Navn</span>
               <input
                 value={name}
                 onChange={(inputEvent) => setName(inputEvent.target.value)}
+                placeholder="Navn"
               />
             </label>
-            <span>E-mail</span>
-            <input
-              value={email}
-              onChange={(inputEvent) => setEmail(inputEvent.target.value)}
-              placeholder="dig@example.com"
-            />
+
+            <label>
+              <span>E-mail</span>
+              <input
+                value={email}
+                onChange={(inputEvent) => setEmail(inputEvent.target.value)}
+                placeholder="dig@example.com"
+              />
+            </label>
 
             <button type="submit" disabled={submitting}>
               {submitting ? "Tilmelder..." : "Tilmeld mig"}
@@ -189,7 +203,6 @@ useEffect(() => {
           </form>
         </section>
       </main>
-   
     </>
   );
 }

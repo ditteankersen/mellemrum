@@ -58,8 +58,7 @@ useEffect(() => {
         body: JSON.stringify({
           name,
           email,
-          eventTitle: event.title,
-          eventDate: event.date,
+          eventId: event.id,
           status: "Tilmeldt",
         }),
       });

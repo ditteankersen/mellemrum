@@ -14,10 +14,10 @@ useEffect(() => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `${SUPABASE_URL}/registrations?order=createdAt.desc`,
-        { headers },
-      );
+   const response = await fetch(
+     `${SUPABASE_URL}/registrations?select=*,events(title,date,venueName,venueAddress)&order=createdAt.desc`,
+     { headers },
+   );
 
       if (!response.ok) {
         throw new Error("Kunne ikke hente tilmeldinger");
@@ -64,17 +64,19 @@ useEffect(() => {
                   <small>{registration.email}</small>
                 </div>
 
-                <span>{registration.eventTitle}</span>
+                <span>{registration.events.title}</span>
 
                 <span>
-                  {new Date(registration.eventDate).toLocaleDateString("da-DK")}
+                  {new Date(registration.events.date).toLocaleDateString(
+                    "da-DK",
+                  )}
                 </span>
 
                 <span className="status">{registration.status}</span>
               </div>
             ))}
           </div>
-        )} 
+        )}
       </main>
     </>
   );

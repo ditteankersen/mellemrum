@@ -59,6 +59,16 @@ useEffect(() => {
     return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
   }
 
+  function getOptimizedImage(imageUrl, width) {
+    const url = new URL(imageUrl);
+
+    url.searchParams.set("w", width);
+    url.searchParams.set("q", "75");
+    url.searchParams.set("auto", "format");
+
+    return url.toString();
+  }
+
   return (
     <>
       <header className="hero">
@@ -113,7 +123,7 @@ useEffect(() => {
             !error &&
             filteredEvents.map((event) => (
               <article className="event-card" key={event.id}>
-                <img src={event.image} alt="" />
+                <img src={getOptimizedImage(event.image, 800)} alt="" loading="lazy"/>
 
                 <div className="event-card-content">
                   <p className="event-category">{event.category}</p>

@@ -7,6 +7,8 @@ export default function EventPage() {
   const [event, setEvent] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [submitError, setSubmitError] = useState(null);
@@ -41,45 +43,64 @@ useEffect(() => {
   getEvent();
 }, [eventId]);
 
-  async function handleSubmit(eventSubmit) {
-    eventSubmit.preventDefault();
-    console.log({ name, email, event: event.title });
+async function handleSubmit(eventSubmit) {
+  eventSubmit.preventDefault();
 
-    if (submitting) return;
+  setNameError("");
+  setEmailError("");
+  setSubmitStatus(null);
+  setSubmitError(null);
 
-    setSubmitting(true);
-    setSubmitStatus(null);
-    setSubmitError(null);
+  let hasError = false;
 
-    try {
-      const response = await fetch(`${SUPABASE_URL}/registrations`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          name,
-          email,
-          eventId: event.id,
-          status: "Tilmeldt",
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-
-        console.error("Supabase-fejl:", errorData);
-        throw new Error(errorData.message || "Fejl ved tilmelding");
-      }
-
-      setSubmitStatus("success");
-      setName("");
-      setEmail("");
-    } catch (error) {
-      console.error("Tilmeldingsfejl:", error);
-      setSubmitError("Der opstod en fejl ved tilmelding. Prøv igen senere.");
-    } finally {
-      setSubmitting(false);
-    }
+  if (!name.trim()) {
+    setNameError("Indtast venligst dit navn.");
+    hasError = true;
   }
+
+  if (!email.trim()) {
+    setEmailError("Indtast venligst din e-mail.");
+    hasError = true;
+  } else if (!email.includes("@")) {
+    setEmailError("Indtast en gyldig e-mailadresse.");
+    hasError = true;
+  }
+
+  if (hasError || submitting) {
+    return;
+  }
+
+  setSubmitting(true);
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/registrations`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        name,
+        email,
+        eventId: event.id,
+        status: "Tilmeldt",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+
+      console.error("Supabase-fejl:", errorData);
+      throw new Error(errorData.message || "Fejl ved tilmelding");
+    }
+
+    setSubmitStatus("success");
+    setName("");
+    setEmail("");
+  } catch (error) {
+    console.error("Tilmeldingsfejl:", error);
+    setSubmitError("Der opstod en fejl ved tilmelding. Prøv igen senere.");
+  } finally {
+    setSubmitting(false);
+  }
+}
 
 if (isLoading) {
   return (
@@ -181,21 +202,43 @@ if (isLoading) {
           <form onSubmit={handleSubmit}>
             <label>
               <span>Navn</span>
+
               <input
+                type="text"
                 value={name}
-                onChange={(inputEvent) => setName(inputEvent.target.value)}
+                onChange={(inputEvent) => {
+                  setName(inputEvent.target.value);
+                  setNameError("");
+                }}
                 placeholder="Navn"
               />
+
+              {nameError && (
+                <span className="field-error" role="alert">
+                  {nameError}
+                </span>
+              )}
             </label>
 
             <label>
               <span>E-mail</span>
+
               <input
+                type="email"
                 value={email}
-                onChange={(inputEvent) => setEmail(inputEvent.target.value)}
+                onChange={(inputEvent) => {
+                  setEmail(inputEvent.target.value);
+                  setEmailError("");
+                }}
                 placeholder="dig@example.com"
               />
-            </label>
+
+              {emailError && (
+                <span className="field-error" role="alert">
+                  {emailError}
+                </span>
+              )}
+            </label> 
 
             <button type="submit" disabled={submitting}>
               {submitting ? "Tilmelder..." : "Tilmeld mig"}

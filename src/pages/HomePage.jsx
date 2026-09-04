@@ -119,11 +119,22 @@ useEffect(() => {
 
           {error && <p role="alert">{error}</p>}
 
+          {!isLoading && !error && filteredEvents.length === 0 && (
+            <p className="no-results">
+              Vi kunne ikke finde nogen events, der matcher din søgning.
+            </p>
+          )}
+
           {!isLoading &&
             !error &&
+            filteredEvents.length > 0 &&
             filteredEvents.map((event) => (
               <article className="event-card" key={event.id}>
-                <img src={getOptimizedImage(event.image, 800)} alt="" loading="lazy"/>
+                <img
+                  src={getOptimizedImage(event.image, 800)}
+                  alt=""
+                  loading="lazy"
+                />
 
                 <div className="event-card-content">
                   <p className="event-category">{event.category}</p>
@@ -133,17 +144,17 @@ useEffect(() => {
                   <p>{event.summary}</p>
 
                   <div className="event-meta">
-                    <span>{formatEventDate(event.date)}</span>
-                    <span>{event.venueName}</span>
-                  </div>
+                  <span>{formatEventDate(event.date)}</span>
+                  <span>{event.venueName}</span>
+                 </div>
 
-                  <Link className="card-link" to={`/events/${event.id}`}>
-                    Læs mere
-                  </Link>
-                </div>
-              </article>
+              <Link className="card-link" to={`/events/${event.id}`}>
+                Læs mere
+               </Link>
+              </div>
+             </article>
             ))}
-        </section>
+        </section> 
       </main>
     </>
   );

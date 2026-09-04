@@ -299,6 +299,10 @@ select:focus {
   padding: 1rem;
 }
 
+.loading-page {
+  min-height: 100vh;
+}
+
 .page-header,
 .admin-header {
   background: var(--green);

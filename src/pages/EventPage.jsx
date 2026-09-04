@@ -81,13 +81,13 @@ useEffect(() => {
     }
   }
 
- if (isLoading) {
-   return (
-     <main>
-       <p>Indlæser event...</p>
-     </main>
-   );
- }
+if (isLoading) {
+  return (
+    <main className="event-page loading-page">
+      <p>Indlæser event...</p>
+    </main>
+  );
+}
 
  if (eventError) {
    return (
@@ -121,7 +121,12 @@ useEffect(() => {
         </Link>
 
         <section className="event-detail">
-          <img src={getOptimizedImage(event.image, 1400)} alt="" />
+          <img
+            className="event-detail-image"
+            src={getOptimizedImage(event.image, 1400)}
+            alt=""
+            fetchPriority="high"
+          />
           <div className="event-detail-content">
             <p className="event-category">{event.category}</p>
             <h1>{event.title}</h1>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { SUPABASE_URL, headers } from "../services/supabase";
+import "./RegistrationsPage.css"; 
 
 export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState([]);

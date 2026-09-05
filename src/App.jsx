@@ -11,6 +11,7 @@ import EventPage from "./pages/EventPage";
 import RegistrationsPage from "./pages/RegistrationsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import LoginPage from "./pages/LoginPage"; 
+import ContactPage from "./pages/ContactPage"; 
 
 import { AuthProvider } from "./context/AuthContext";
 
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/events/:eventId" element={<EventPage />} />
           <Route path="/om" element={<AboutPage />} />
+          <Route path="/kontakt" element={<ContactPage />} /> 
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/tilmeldinger" element={<RegistrationsPage />} />

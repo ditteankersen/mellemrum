@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { SUPABASE_URL, headers } from "../services/supabase";
+import "./EventPage.css";
 
 export default function EventPage() {
   const { eventId } = useParams();

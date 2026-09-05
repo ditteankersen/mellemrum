@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import { SUPABASE_URL, headers } from "../services/supabase";
 import "./EventPage.css";
 
@@ -15,32 +15,38 @@ export default function EventPage() {
   const [submitError, setSubmitError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [eventError, setEventError] = useState(null);
+  const [eventNotFound, setEventNotFound] = useState(false);
 
 useEffect(() => {
   async function getEvent() {
-    try {
-      setIsLoading(true);
-      setEventError(null);
+   try {
+     setIsLoading(true);
+     setEventError(null);
+     setEventNotFound(false);
+     setEvent(null);
 
-      const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}`, {
-        headers,
-      });
+     const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}`, {
+       headers,
+     });
 
-      if (!response.ok) {
-        throw new Error("Kunne ikke hente event");
-      }
+     if (!response.ok) {
+       throw new Error("Kunne ikke hente event");
+     }
 
-      const data = await response.json();
-      if (!data[0]) {
-      throw new Error("Event ikke fundet");
-      }
-      setEvent(data[0]);
-    } catch (error) {
-      console.error("Fejl ved hentning af event:", error);
-      setEventError("Eventet kunne ikke indlæses. Prøv igen senere.");
-    } finally {
-      setIsLoading(false);
-    }}
+     const data = await response.json();
+
+     if (!data[0]) {
+       setEventNotFound(true);
+       return;
+     }
+
+     setEvent(data[0]);
+   } catch (error) {
+     console.error("Fejl ved hentning af event:", error);
+     setEventError("Eventet kunne ikke indlæses. Prøv igen senere.");
+   } finally {
+     setIsLoading(false);
+   }}
   getEvent();
 }, [eventId]);
 
@@ -133,17 +139,21 @@ if (isLoading) {
   );
 }
 
- if (eventError) {
-   return (
-     <main>
-       <p role="alert">{eventError}</p>
-     </main>
-   );
- }
+if (eventNotFound) {
+  return <Navigate to="/404" replace />;
+}
 
- if (!event) {
-   return null;
- }
+if (eventError) {
+  return (
+    <main>
+      <p role="alert">{eventError}</p>
+    </main>
+  );
+}
+
+if (!event) {
+  return null;
+} 
 
   const date = new Date(event.date);
 

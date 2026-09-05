@@ -71,15 +71,37 @@ async function handleSubmit(eventSubmit) {
     return;
   }
 
+  const normalizedEmail = email.trim().toLowerCase();
+
   setSubmitting(true);
 
   try {
+
+    const existingRegistrationResponse = await fetch(
+      `${SUPABASE_URL}/registrations?eventId=eq.${event.id}&email=eq.${encodeURIComponent(normalizedEmail)}`,
+      {
+        headers,
+      },
+    );
+
+    if (!existingRegistrationResponse.ok) {
+      throw new Error("Kunne ikke kontrollere eksisterende tilmeldinger");
+    }
+
+    const existingRegistrations = await existingRegistrationResponse.json();
+
+
+    if (existingRegistrations.length > 0) {
+      setEmailError("Denne e-mail er allerede tilmeldt dette event.");
+      return;
+    }
+
     const response = await fetch(`${SUPABASE_URL}/registrations`, {
       method: "POST",
       headers,
       body: JSON.stringify({
-        name,
-        email,
+        name: name.trim(),
+        email: normalizedEmail,
         eventId: event.id,
         status: "Tilmeldt",
       }),
@@ -101,7 +123,7 @@ async function handleSubmit(eventSubmit) {
   } finally {
     setSubmitting(false);
   }
-}
+} 
 
 if (isLoading) {
   return (
